@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements AbsListView.OnIte
         // 可用空间
 //        String availableMemory = Formatter.formatFileSize(this, availableBlocks * blockSize);
         long availableMemory = availableBlocks * blockSize / 1024 / 1024;
-        //
+        //--
 
         return availableMemory;
     }
