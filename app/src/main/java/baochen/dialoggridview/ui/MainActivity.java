@@ -2,6 +2,8 @@ package baochen.dialoggridview.ui;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,7 +15,9 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
 import java.util.List;
 
 import baochen.dialoggridview.R;
@@ -21,14 +25,15 @@ import baochen.dialoggridview.adapter.ShareAdapter;
 import baochen.dialoggridview.share.Share;
 import baochen.dialoggridview.share.ShareItem;
 import baochen.dialoggridview.share.ShareType;
+import baochen.dialoggridview.utils.MyAlertDialog;
 import baochen.dialoggridview.utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements AbsListView.OnItemClickListener {
 
 
-    private TextView text_view;
-    private Button btnShare;
-    private Button btnSub;
+    private TextView text_view, tv_memory;
+    private Button btnShare, btnSub, btnCache;
+
 
     private Share mShare;
     private Dialog dialog;
@@ -48,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements AbsListView.OnIte
 
         btnShare = (Button) findViewById(R.id.btn_share);
         btnSub = (Button) findViewById(R.id.btn_sub);
+        btnCache = (Button) findViewById(R.id.btn_cache);
+        tv_memory = (TextView) findViewById(R.id.tv_memory);
 
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +82,14 @@ public class MainActivity extends AppCompatActivity implements AbsListView.OnIte
 
 //        gridView.setAdapter(shareAdapter);
 //        gridView.setOnItemClickListener(this);
+
+
+        btnCache.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLocalMemory();
+            }
+        });
 
 
     }
@@ -142,5 +157,55 @@ public class MainActivity extends AppCompatActivity implements AbsListView.OnIte
 //        return items;
 //
 //    }
+    private void getLocalMemory() {
+
+        // 获得sd卡的内存状态
+        File sdcardFileDir = Environment.getExternalStorageDirectory();
+        long sdcardMemory = getMemoryInfo(sdcardFileDir);
+
+        // 获得手机内部存储控件的状态
+        File dataFileDir = Environment.getDataDirectory();
+        long dataMemory = getMemoryInfo(dataFileDir);
+
+        tv_memory.setText("SD卡: " + sdcardMemory + "\n手机内部: " + dataMemory);
+        long i = 5;
+        if (dataMemory >= 5) {
+            text_view.setText("还有很多");
+            MyAlertDialog.getInstance().showDialog(this, "内存不够了", new MyAlertDialog.DialogCallBack() {
+                @Override
+                public void exectEvent() {
+                    Toast.makeText(MainActivity.this, "确定了", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void cancelEvent() {
+                    Toast.makeText(MainActivity.this, "取消了", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else if (dataMemory < 5) {
+            text_view.setText("不够了");
+        }
+
+    }
+
+
+    private long getMemoryInfo(File path) {
+        StatFs stat = new StatFs(path.getPath());
+
+        long blockSize = stat.getBlockSize();
+
+        long totalBlocks = stat.getBlockCount();
+
+        long availableBlocks = stat.getAvailableBlocks();
+
+        // 总空间
+//        String totalMemory = Formatter.formatFileSize(this, totalBlocks * blockSize);
+        long totalMemory = totalBlocks * blockSize / 1024 / 1024;
+        // 可用空间
+//        String availableMemory = Formatter.formatFileSize(this, availableBlocks * blockSize);
+        long availableMemory = availableBlocks * blockSize / 1024 / 1024;
+
+        return availableMemory;
+    }
 
 }

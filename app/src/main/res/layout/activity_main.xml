@@ -25,4 +25,22 @@
         android:text="Sub" />
 
 
+    <Button
+        android:id="@+id/btn_cache"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="Memory" />
+
+
+    <TextView
+        android:id="@+id/tv_memory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_sub"
+        android:gravity="center_horizontal"
+        android:text="hahahahh"
+        android:textSize="20sp" />
+
+
 </RelativeLayout>
